@@ -1,0 +1,80 @@
+\documentclass{standalone}
+% Diagram a cart with an inverted pendulumn attached to it.
+
+% My favorite LaTeX font.
+\usepackage{charter}
+% To use if-statements.
+\usepackage{ifthen}
+\usepackage{tikz}
+\usetikzlibrary{calc, patterns}
+
+% Use the sans-serif font.
+\renewcommand{\familydefault}{\sfdefault}
+
+% Bring in all the macros.
+\input{mechanicslibrary}
+
+\begin{document}
+\begin{tikzpicture}
+
+% - Define variables/parameters.
+\def\walllength{10}
+\def\wallheight{8}
+\def\wallthick{.4}
+
+\def\cartwidth{3}
+\def\cartheight{2}
+\def\cartwheeldiam{0.6}
+\def\cartxpos{3}
+
+\def\rodlength{6}
+\def\rodthick{.4}
+\def\rodangle{60}
+
+\definecolor{mygreen}{rgb}{0, 0.5, 0}
+\definecolor{myred}{rgb}{0.8, 0.5, 0.5}
+\definecolor{myblue}{rgb}{0.5, 0.5, 0.8}
+
+% Define coordinates.
+\coordinate (origin) at (0, 0);
+\coordinate (cartpos) at (\cartxpos, 0);
+
+% Ground.
+\bottomleftwall{origin}{\walllength}{\wallheight}{\wallthick}{mygreen}
+\framelabel{N}{0,6.5}{.5, 7}{south}{bend right}{mygreen}
+
+% Cart.
+\cart{A}{cartpos}{\cartwidth}{\cartheight}{\cartwheeldiam}{myred}
+\framelabel{A}{3, 2.5}{2.5, 3}{south}{bend left}{myred}
+
+% - Rod.
+% Define the point at which the rod attaches.
+%   -> Need to define this point here, since we need Acm to be defined first.
+\coordinate (rodattachment) at ($(Acm) + (0, 0.25 * \cartheight)$);
+\rod{B}{rodattachment}{\rodlength}{\rodthick}{\rodangle}{myblue}
+% Draw a black dot as a hinge.
+\hinge{rodattachment}{0.25 * \rodthick}
+\framelabel{B}{$(Acm) + (\rodangle:0.7 * \rodlength)$}
+    {$(Acm) + (\rodangle:0.7 * \rodlength) + (.7, 0)$}{west}{bend right}
+    {myblue}
+
+% Vector bases.
+\basistwodim{n}{1,5}{0}{mygreen}
+\basistwodim{b}{$(rodattachment)+(\rodangle:0.8*\rodlength)$}{-90+\rodangle}
+    {black}
+
+% - Dimensions.
+% x dimension, with N_O point.
+\coordinate (NO) at ($(origin)!(Acm)!(up:1)$);
+\fill (NO) circle (.1) node[above right] {$N_O$};
+\dimsimple{$x$}{NO}{$(cartpos)!(Acm)!(\cartxpos, 0)$}{below}
+
+% Distance to Bcm.
+\dimoffset{$L$}{rodattachment}{Bcm}{0.7}{below right}
+
+% Vertical dashed line to use for theta.
+\draw[gray, dashed] (rodattachment) -- +(up:0.75 * \rodlength);
+\dimangle{$\theta$}{rodattachment}{Bcm}{0.6 * \rodlength}{90-\rodangle}{above}
+
+\end{tikzpicture}
+\end{document}

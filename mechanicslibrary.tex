@@ -1,0 +1,227 @@
+
+\newcommand{\pgfextractangle}[3]{
+    % Obtains the angle between two coordinates, setting it to the first input.
+    % 1: variable to set to the angle (e.g. \angle).
+    % 2: point 1.
+    % 3: point 2.
+
+    \pgfmathanglebetweenpoints{\pgfpointanchor{#2}{center}}
+                              {\pgfpointanchor{#3}{center}}
+    \global\let#1\pgfmathresult  
+}
+
+\newcommand{\pgfextractdist}[3]{
+    % Obtains the distance between two points, setting it to the first input.
+    % 1: variable to set to the distance (e.g. \dist).
+    % 2: point 1.
+    % 3: point 2.
+    \pgfpointdiff{\pgfpointanchor{#2}{center}}
+                 {\pgfpointanchor{#3}{center}}
+    \global\let#1\pgfmathresult  
+}
+
+\newcommand{\centerofmass}[1]{
+    % Draws a center of mass circle.
+    % 1: position.
+    % TODO fix vertical 'overlap' of black between quadrants I and III.
+
+    \draw[fill] (#1) -- +(0.1, 0) arc (0:90:0.1);
+    \draw[fill] (#1) -- +(-0.1, 0) arc (180:270:0.1);
+    \draw[fill=white] (#1) -- +(0,0.1) arc (90:180:0.1);
+    \draw[fill=white] (#1) -- +(0,-0.1) arc (270:360:0.1);
+    \draw (#1) circle (0.1);
+}
+
+\newcommand{\bottomwall}[4]{
+    % Draws a horizontal rigid wall intended to be on bottom of diagram.
+    % 1: position of the top left corner of the wall.
+    % 2: length of the wall.
+    % 3: thickness of the wall.
+    % 4: color of the wall.
+
+    % Draw the hashed part.
+    \draw[white,
+        pattern color=#4,
+        pattern=north east lines
+        ]
+        (#1) rectangle +(#2,-#3);
+
+    % Draw the line of the wall.
+    \draw[very thick, #4] (#1) -- +(right:#2);
+}
+
+\newcommand{\leftwall}[4]{
+    % Draws a vertical rigid wall intended to be on the left side of diagram.
+    % 1: position of the bottom right corner of the wall.
+    % 2: length of the wall.
+    % 3: thickness of the wall.
+    % 4: color of the wall.
+
+    % Draw the hashed part.
+    \draw[white,
+        pattern color=#4,
+        pattern=north east lines
+        ]
+        (#1) rectangle (-#3,#2);
+
+    % Draw the line of the wall.
+    \draw[very thick, #4] (#1) -- +(up:#2);
+}
+
+\newcommand{\bottomleftwall}[5]{
+    % Draws a horizontal and vertical wall, intended to be on
+    % the bottom right of the diagram.
+    % 1: position of the bottom right corner of the wall, INSIDE the 'room'.
+    % 2: width of the bottom wall.
+    % 3: height of the left wall.
+    % 4: thickness of the wall.
+    % 5: color of the wall.
+
+    % Draw the hashed part.
+    \draw[white,
+        pattern color=#5,
+        pattern=north east lines
+        ]
+        (#1) -- ++(right:#2) -- ++(down:#4) -- ++(left:#2 + #4) -- 
+            ++(up:#3 + #4) -- ++(right:#4) -- cycle;
+
+    % - Draw the line of the wall.
+    % Horizontal.
+    \draw[very thick, #5] (#1) -- +(right:#2);
+    % Vertical.
+    \draw[very thick, #5] (#1) -- +(up:#3);
+}
+
+\newcommand{\cart}[6]{
+    % Draws a cart, with a center of mass, and defines a point for the center
+    % of mass of the cart, '<name>cm', that can be used elsewhere in the code.
+    % 1: one-letter capital name (e.g. A)
+    % 2: position of lower left corner of cart.
+    % 3: width of rectangle
+    % 4: height of rectangle
+    % 5: wheel diameter
+    % 6: color.
+
+    % Draw the body, and both wheels.
+    % TODO remove Apply fill and draw settings to the rectangle and both wheels.
+    % Draw the border as darker than the fill.
+    
+    % - Draw all of the cart.
+    \filldraw[fill=#6, very thick, draw=#6!60!black]
+        % Body.
+        (#2)++(0, #5) rectangle +(#3, #4)
+        % Left wheel.
+        (#2)++(0.5 * #5, 0.5 * #5) circle (0.5 * #5)
+        %% Right wheel.
+        (#2)++(#3 - 0.5 * #5, 0.5 * #5) circle (0.5 * #5);
+
+    % Create a center of mass coordinate, and draw the COM symbol.
+    \coordinate (#1cm) at ($(#2) + (0, #5) + (0.5 * #3, 0.5 * #4)$);
+    \centerofmass{#1cm}
+}
+ 
+\newcommand{\rod}[6]{
+    % Draws a rod, and defines a point for the center
+    % of mass of the rod, '<name>cm', that can be used elsewhere in the code.
+    % 1: one-letter capital name (e.g. A)
+    % 2: position of one end of rod.
+    % 3: length of the rod.
+    % 4: thickness of the rod.
+    % 5: angle of the rod from the horizontal.
+    % 6: color.
+    
+    % Draw the rod.
+    \filldraw[fill=#6, very thick, draw=#6!60!black, rotate=#5]
+        ($(#2) + (0,0.5 * #4)$) rectangle +(#3, -#4);
+
+    % Create a center of mass coordinate, and draw the COM symbol.
+    \path (#2) -- coordinate (#1cm) +(#5:#3);
+    \centerofmass{#1cm}
+}
+
+\newcommand{\hinge}[2]{
+    % Draws a hinge.
+    % 1: position of the hinge.
+    % 2: diameter of the hinge to be drawn.
+
+    \fill (#1) circle (#2);
+}
+
+
+\newcommand{\framelabel}[6]{
+    % Creates a frame label: a letter in a circle with an arrow pointing
+    % to the rigid body. In order to do its job, it defines the coordinate
+    % '<name>node'.
+    % 1: name.
+    % 2: point to which the arrow points.
+    % 3: point FROM which the arrow points.
+    % 4: direction from which the arrow leaves the node (e.g. south).
+    % 5: bend of the edge (e.g. bend right).
+    % 6: color.
+
+    \path (#3) node[shape=circle, draw=#6] (#1node) {\textcolor{#6}{#1}};
+    \path[<-, #6] (#2) edge [#5] (#1node.#4);
+}
+
+\newcommand{\basistwodim}[4]{
+    % Draws a dextral orthogonal vector basis, with x and y in the plane.
+    % 1: letter.
+    % 2: center.
+    % 3: rotation from the horizontal of the x component.
+    % 4: color.
+
+    \draw[->, #4, very thick]
+        (#2) -- +(#3:0.7) node[above] {$\mathbf{\vec{#1}}_x$};
+    \draw[->, #4, very thick]
+        (#2) -- +(#3 + 90:0.7) node[above] {$\mathbf{\vec{#1}}_y$};
+    \draw[->, #4, very thick] (#2)++(-60:0.2) arc (-60:135:0.2)
+        node[below] {$\mathbf{\vec{#1}}_z$};
+}
+ 
+\newcommand{\dimsimple}[4]{
+    % Draws a simple dimension, with the text in the middle of the dimension
+    % line.
+    % 1: text. 
+    % 2: point 1.
+    % 3: point 2.
+    % 4: direction in which the text is placed around the midpoint of the dim.
+    % TODO See if we can have the dimensions break the midway of the dimline, so
+    % that we can save space, but this means doing something clever with TikZ.
+    \draw[<->,>=latex,every rectangle node/.style={midway}]
+        (#2) -- (#3) node[#4] {#1};
+}
+ 
+\newcommand{\dimoffset}[5]{
+    % Draws an offset dimension, with the dimension bar offset a certain amount
+    % and the text in the middle of the bar.
+    % 1: text.
+    % 2: point 1.
+    % 3: point 2.
+    % 4: offset, positive or negative.
+    % 5: direction in which the text is placed around the midpoint of the dim.
+    % TODO may only work for quadrants I and II.
+
+    \pgfextractangle{\dimoffsetangle}{#2}{#3}
+    \def\doanglesub{\dimoffsetangle - 90}
+    \draw (#2) -- ++(\doanglesub:#4) coordinate (dimoset1) --+(\doanglesub:.2);
+    \draw (#3) -- ++(\doanglesub:#4) coordinate (dimoset2) --+(\doanglesub:.2);
+    \draw[<->,>=latex,every rectangle node/.style={midway}]
+        (dimoset1) -- (dimoset2) node[#5] {#1};
+}
+
+\newcommand{\dimangle}[6]{
+    % Angle dimension.
+    % 1: text.
+    % 2: center of rotation point.
+    % 3: a point along one of the rays making the angle.
+    % 4: distance from center of rotation to show dimension arc.
+    % 5: angle about center away from the point.
+    % 6: direction in which the text is placed around the midpoint of the dim.
+
+    \pgfextractangle{\dimangleone}{#2}{#3}
+    \draw[<->,>=latex,every rectangle node/.style={midway}]
+        (#2)++(\dimangleone:#4) arc (\dimangleone:\dimangleone+#5:#4);
+    \path (#2)++(\dimangleone:#4) arc (\dimangleone:\dimangleone+0.5*(#5):#4)
+        node[#6] {#1};
+}
+
