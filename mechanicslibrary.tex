@@ -1,3 +1,25 @@
+\usepackage{tikz}
+\usetikzlibrary{calc, patterns}
+\usetikzlibrary{shapes,arrows}
+
+% aleeper: Some styles I stole from one of my papers (probably needs refinement, if we use)
+\tikzstyle{myarrow} = [-latex, thick, rounded corners=5.0]
+\tikzstyle{myarrow_notrounded} = [-latex, thick]
+\tikzstyle{myline} = [-, thick, rounded corners = 5.0]
+
+% Define common color palette for mechanics problems.
+\definecolor{darkred}   {rgb}{0.5, 0.1, 0.1}
+\definecolor{medred}    {rgb}{0.8, 0.5, 0.5}
+\definecolor{lightred}  {rgb}{1.0, 0.75, 0.75}
+
+\definecolor{darkgreen} {rgb}{0.1, 0.5, 0.1}
+\definecolor{medgreen}  {rgb}{0.5, 0.8, 0.5}
+\definecolor{lightgreen}{rgb}{0.75, 1.0, 0.75}
+
+\definecolor{darkblue}  {rgb}{0.1, 0.1, 0.5}
+\definecolor{medblue}   {rgb}{0.5, 0.5, 0.8}
+\definecolor{lightblue} {rgb}{0.75, 0.75, 1.0}
+
 
 \newcommand{\pgfextractangle}[3]{
     % Obtains the angle between two coordinates, setting it to the first input.
@@ -32,6 +54,18 @@
     \draw (#1) circle (0.1);
 }
 
+\newcommand{\labeledArrow}[5]{
+    % Draws an arrow with a label
+    % 1: START point.
+    % 2: END point.
+    % 3: Label
+    % 4: Label position offset from START point
+    % 5: color
+	\draw [->, very thick, draw=#5] (#1) -- (#2);
+	\node (#3) at ($(#1)+(#4)$) []
+    {\textcolor{#5}{#3}};
+}
+
 \newcommand{\bottomwall}[4]{
     % Draws a horizontal rigid wall intended to be on bottom of diagram.
     % 1: position of the top left corner of the wall.
@@ -62,7 +96,7 @@
         pattern color=#4,
         pattern=north east lines
         ]
-        (#1) rectangle (-#3,#2);
+        (#1) rectangle ($(#1) + (-#3,#2)$);
 
     % Draw the line of the wall.
     \draw[very thick, #4] (#1) -- +(up:#2);
@@ -70,7 +104,7 @@
 
 \newcommand{\bottomleftwall}[5]{
     % Draws a horizontal and vertical wall, intended to be on
-    % the bottom right of the diagram.
+    % the bottom left of the diagram.
     % 1: position of the bottom right corner of the wall, INSIDE the 'room'.
     % 2: width of the bottom wall.
     % 3: height of the left wall.
@@ -107,7 +141,7 @@
     % Draw the border as darker than the fill.
     
     % - Draw all of the cart.
-    \filldraw[fill=#6, very thick, draw=#6!60!black]
+    \filldraw[fill=#6, very thick, draw=#6!40!black]
         % Body.
         (#2)++(0, #5) rectangle +(#3, #4)
         % Left wheel.
@@ -131,7 +165,7 @@
     % 6: color.
     
     % Draw the rod.
-    \filldraw[fill=#6, very thick, draw=#6!60!black, rotate=#5]
+    \filldraw[fill=#6, very thick, draw=#6!40!black, rotate=#5]
         ($(#2) + (0,0.5 * #4)$) rectangle +(#3, -#4);
 
     % Create a center of mass coordinate, and draw the COM symbol.
@@ -147,6 +181,14 @@
     \fill (#1) circle (#2);
 }
 
+\newcommand{\point}[3]{
+    % Draws a point.
+    % 1: position of the hinge.
+    % 2: diameter of the hinge to be drawn.
+
+    \fill[fill=#3, very thick, draw=#3!40!black] (#1) circle (#2);
+}
+
 
 \newcommand{\framelabel}[6]{
     % Creates a frame label: a letter in a circle with an arrow pointing
@@ -159,24 +201,73 @@
     % 5: bend of the edge (e.g. bend right).
     % 6: color.
 
-    \path (#3) node[shape=circle, draw=#6] (#1node) {\textcolor{#6}{#1}};
-    \path[<-, #6] (#2) edge [#5] (#1node.#4);
+    \path (#3) node[shape=circle, minimum size=4mm, inner sep=0pt, draw=#6, fill=white] 
+    (#1node) {\textcolor{#6}{#1}};
+    \path[<-, #6, thick] (#2) edge [#5] (#1node.#4);
 }
 
-\newcommand{\basistwodim}[4]{
+\newcommand{\pointlabel}[3]{
+    % Creates a label with no arrow: a letter in a circle.
+    % In order to do its job, it defines the coordinate
+    % '<name>node'.
+    % 1: name.
+    % 2: location
+    % 3: color.
+
+    \node (#1) at (#2) [shape=circle, minimum size=4mm, inner sep=0pt, draw=#3, fill=white]
+    {\textcolor{#3}{#1}};
+}
+
+\newcommand{\basisXY}[5]{
     % Draws a dextral orthogonal vector basis, with x and y in the plane.
     % 1: letter.
     % 2: center.
     % 3: rotation from the horizontal of the x component.
     % 4: color.
-
-    \draw[->, #4, very thick]
-        (#2) -- +(#3:0.7) node[above] {$\mathbf{\vec{#1}}_x$};
-    \draw[->, #4, very thick]
-        (#2) -- +(#3 + 90:0.7) node[above] {$\mathbf{\vec{#1}}_y$};
-    \draw[->, #4, very thick] (#2)++(-60:0.2) arc (-60:135:0.2)
-        node[below] {$\mathbf{\vec{#1}}_z$};
+    \basisInPlaneTwo{#1}{#2}{#3}{#4}{#5}{x}{y}
 }
+
+\newcommand{\basisXYZ}[5]{
+    % Draws a dextral orthogonal vector basis, with x and y in the plane and z out.
+    % 1: letter.
+    % 2: center.
+    % 3: rotation from the horizontal of the x component.
+    % 4: color.
+    \basisInPlaneThree{#1}{#2}{#3}{#4}{#5}{x}{y}{z}
+}
+
+\newcommand{\basisInPlaneTwo}[7]{
+    % Draws a dextral orthogonal vector basis (out of plane vector is omitted)
+    % 1: letter.
+    % 2: center.
+    % 3: rotation from the horizontal of the x component.
+    % 4: color.
+    % 5: the label for the vector pointing "right".
+    % 6: label for vector pointing "up".
+    % 7: label for vector pointing "out".
+    \draw[->, #4, very thick]
+        (#2) -- +(#3:1*#5) node[above] {$\mathbf{\hat{#1}}_\mathrm{\textbf{#6}}$};
+    \draw[->, #4, very thick]
+        (#2) -- +(#3 + 90:1*#5) node[above] {$\mathbf{\hat{#1}}_\mathrm{\textbf{#7}}$};
+}
+
+\newcommand{\basisInPlaneThree}[8]{
+    % Draws a dextral orthogonal vector basis with a vector out of page
+    % 1: letter.
+    % 2: center.
+    % 3: rotation from the horizontal of the x component.
+    % 4: color.
+    % 5: the label for the vector pointing "right".
+    % 6: label for vector pointing "up".
+    % 7: label for vector pointing "out".
+    \draw[->, #4, very thick]
+        (#2) -- +(#3:1*#5) node[above] {$\mathbf{\hat{#1}}_\mathrm{\textbf{#6}}$};
+    \draw[->, #4, very thick]
+        (#2) -- +(#3 + 90:1*#5) node[above] {$\mathbf{\hat{#1}}_\mathrm{\textbf{#7}}$};
+    \draw[->, #4, very thick] (#2)++(-60:0.2) arc (-60:150:0.2)
+        node[below] {$\mathbf{\hat{#1}}_\mathrm{\textbf{#8}}$};
+}
+
  
 \newcommand{\dimsimple}[4]{
     % Draws a simple dimension, with the text in the middle of the dimension
