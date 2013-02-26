@@ -18,59 +18,69 @@
 \begin{tikzpicture}
 
 % - Define variables/parameters.
-\def\walllength{10}
-\def\wallheight{8}
+\def\walllength{7}
+\def\wallheight{1.25}
+\def\wallheightabove{1.5}
+\def\wallstartabove{2}
 \def\wallthick{.4}
 
 \def\cartwidth{3}
 \def\cartheight{2}
-\def\cartwheeldiam{0.6}
-\def\cartxpos{3}
+\def\cartwheeldiam{0.6}myred
+\def\cartxpos{2.5}
 
 \def\rodlength{6}
 \def\rodthick{.4}
 \def\rodangle{60}
 
-\definecolor{mygreen}{rgb}{0, 0.5, 0}
-\definecolor{myred}{rgb}{0.8, 0.5, 0.5}
-\definecolor{myblue}{rgb}{0.5, 0.5, 0.8}
+\def\forceHeight{0.8}
+\def\forceLength{1}
 
 % Define coordinates.
 \coordinate (origin) at (0, 0);
 \coordinate (cartpos) at (\cartxpos, 0);
+\coordinate (coordWallStartAbove) at ($(origin) + (0, \wallstartabove)$);
 
 % Ground.
-\bottomleftwall{origin}{\walllength}{\wallheight}{\wallthick}{mygreen}
-\framelabel{N}{0,6.5}{.5, 7}{south}{bend right}{mygreen}
+\bottomleftwall{origin}{\walllength}{\wallheight}{\wallthick}{darkgreen}
+\leftwall{coordWallStartAbove}{\wallheightabove}{\wallthick}{darkgreen}
+\framelabel{N}{0,2.5}{.5, 3}{south}{bend right}{darkgreen}
 
 % Cart.
-\cart{A}{cartpos}{\cartwidth}{\cartheight}{\cartwheeldiam}{myred}
-\framelabel{A}{3, 2.5}{2.5, 3}{south}{bend left}{myred}
+\cart{A}{cartpos}{\cartwidth}{\cartheight}{\cartwheeldiam}{lightred}
+\pointlabel{A}{$(Acm) + (0, -0.4)$}{darkred}
 
 % - Rod.
 % Define the point at which the rod attaches.
 %   -> Need to define this point here, since we need Acm to be defined first.
-\coordinate (rodattachment) at ($(Acm) + (0, 0.25 * \cartheight)$);
-\rod{B}{rodattachment}{\rodlength}{\rodthick}{\rodangle}{myblue}
+\coordinate (rodattachment) at ($(Acm)$);
+\rod{B}{rodattachment}{\rodlength}{\rodthick}{\rodangle}{lightblue}
 % Draw a black dot as a hinge.
 \hinge{rodattachment}{0.25 * \rodthick}
-\framelabel{B}{$(Acm) + (\rodangle:0.7 * \rodlength)$}
-    {$(Acm) + (\rodangle:0.7 * \rodlength) + (.7, 0)$}{west}{bend right}
-    {myblue}
+\framelabel{B}{$(Acm) + (\rodangle:0.7 * \rodlength) $}
+    {$(Acm) + (\rodangle:0.7 * \rodlength) + (-.5, 0.7)$}{south}{bend left}
+    {darkblue}
+% Label center of mass
+\node at (Bcm) [right] {$\mathrm{\mathbf{B}}_\mathrm{cm}$};
 
 % Vector bases.
-\basistwodim{n}{1,5}{0}{mygreen}
-\basistwodim{b}{$(rodattachment)+(\rodangle:0.8*\rodlength)$}{-90+\rodangle}
-    {black}
+\basisXYZ{n}{0,4}{0}{darkgreen}{1}
+%\basisXY{b}{$(rodattachment)+(\rodangle:0.8*\rodlength)$}{-90+\rodangle}{darkblue}
+\basisXY{b}{$(rodattachment)$}{-90+\rodangle}{darkblue}{0.9}
 
 % - Dimensions.
 % x dimension, with N_O point.
 \coordinate (NO) at ($(origin)!(Acm)!(up:1)$);
-\fill (NO) circle (.1) node[above right] {$N_O$};
-\dimsimple{$x$}{NO}{$(cartpos)!(Acm)!(\cartxpos, 0)$}{below}
+\point{NO}{0.1}{green};
+\node at (NO) [above left] {$N_O$};
+\dimsimple{$x$}{$(NO)!0.03!(Acm)$}{$(NO)!0.97!(Acm)$}{above}
 
 % Distance to Bcm.
-\dimoffset{$L$}{rodattachment}{Bcm}{0.7}{below right}
+\dimoffset{$L$}{rodattachment}{Bcm}{1}{right}
+
+% Force on A
+\labeledArrow{\cartxpos - \forceLength, \forceHeight}{\cartxpos, \forceHeight}
+			 {$F_c$}{-0.3, 0}{darkred}
 
 % Vertical dashed line to use for theta.
 \draw[gray, dashed] (rodattachment) -- +(up:0.75 * \rodlength);
