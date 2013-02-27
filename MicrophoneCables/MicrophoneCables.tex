@@ -1,0 +1,99 @@
+\documentclass{standalone}
+% Diagram a cart with an inverted pendulumn attached to it.
+
+% My favorite LaTeX font.
+\usepackage{charter}
+% To use if-statements.
+\usepackage{ifthen}
+
+% Use the sans-serif font.
+\renewcommand{\familydefault}{\sfdefault}
+
+% Bring in all the macros.
+\input{../mechanicslibrary}
+
+\newcommand{\backwallTD}[5]{
+    % Draws a 3D wall parallel to the z = 0 plane, with only the 3 +x, +y, +z
+    % faces.
+    % 1: coordinate lower left corner toward +z.
+    % 2: width.
+    % 3: height.
+    % 4: thickness.
+    % 5: color.
+
+    \begin{scope}[shift=(#1), line join=round]
+
+        % Front face.
+        \draw[#5!40!black,fill=#5] (0, 0) rectangle +(#2, #3);
+
+        % Top face.
+        \begin{scope}[canvas is xz plane at y=#3]
+            \draw[#5!40!black,fill=#5] (0, 0) rectangle (#2, -#4);
+        \end{scope}
+
+        % Side face.
+        \begin{scope}[canvas is zy plane at x=#2]
+            \draw[#5!40!black,fill=#5] (0, 0) rectangle (-#4, #3);
+        \end{scope}
+
+    \end{scope}
+}
+
+\newcommand{\leftwallTD}[5]{
+    % Draws a TD wall parallel to the x = 0 plane, with only the 3 +x, +y, +z
+    % faces.
+    % 1: coordinate lower right corner toward +x.
+    % 2: width.
+    % 3: height.
+    % 4: thickness.
+    % 5: color.
+
+    \begin{scope}[shift=(#1), line join=round]
+
+        % Front face.
+        \begin{scope}[canvas is xy plane at z=#2]
+            \draw[#5!40!black,fill=#5] (0,0) rectangle +(-#4, #3);
+        \end{scope}
+
+        % Top face.
+        \begin{scope}[canvas is xz plane at y=#3]
+            \draw[#5!40!black,fill=#5] (0,0) rectangle (-#4, #2);
+        \end{scope}
+
+        % Side face.
+        \begin{scope}[canvas is zy plane at x=0]
+            \draw[#5!40!black,fill=#5] (0,0) rectangle (#2, #3);
+        \end{scope}
+
+    \end{scope}
+}
+
+\begin{document}
+\thispagestyle{empty}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.3]
+
+    \def\wallthick{1}
+\coordinate (origin) at (0, 0, 0);
+\coordinate (A) at (0, 8, 20);
+\coordinate (B) at (0, 8, 0);
+\coordinate (C) at (15, 8, 0);
+\coordinate (Q) at (7, 5, 8);
+
+\backwallTD{origin}{15}{8}{\wallthick}{medblue}
+\leftwallTD{origin}{20}{8}{\wallthick}{medgreen}
+
+\draw (A) node[above left] {$A$} -- (Q);
+\draw (B) node[above] {$B$} -- (Q);
+\draw (C) node[above right] {$C$} -- (Q);
+
+\draw[red,->] (origin) -- (1, 0, 0);
+\draw[green,->] (origin) -- (0, 1, 0);
+\draw[blue,->] (origin) -- (0, 0, 1);
+
+
+
+\end{tikzpicture}
+\end{center}
+\end{document}

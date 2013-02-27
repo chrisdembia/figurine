@@ -1,6 +1,5 @@
 \usepackage{tikz}
-\usetikzlibrary{calc, patterns}
-\usetikzlibrary{shapes,arrows}
+\usetikzlibrary{calc, patterns, shapes, arrows, 3d}
 
 % aleeper: Some styles I stole from one of my papers (probably needs refinement, if we use)
 \tikzstyle{myarrow} = [-latex, thick, rounded corners=5.0]
@@ -228,7 +227,8 @@
 }
 
 \newcommand{\basisXYZ}[5]{
-    % Draws a dextral orthogonal vector basis, with x and y in the plane and z out.
+    % Draws a dextral orthogonal vector basis, with x and y in the plane and z
+    % out.
     % 1: letter.
     % 2: center.
     % 3: rotation from the horizontal of the x component.
@@ -246,9 +246,11 @@
     % 6: label for vector pointing "up".
     % 7: label for vector pointing "out".
     \draw[->, #4, very thick]
-        (#2) -- +(#3:1*#5) node[above] {$\mathbf{\hat{#1}}_\mathrm{\textbf{#6}}$};
+        (#2) -- +(#3:1*#5) node[above]
+        {$\mathbf{\hat{#1}}_\mathrm{\textbf{#6}}$};
     \draw[->, #4, very thick]
-        (#2) -- +(#3 + 90:1*#5) node[above] {$\mathbf{\hat{#1}}_\mathrm{\textbf{#7}}$};
+        (#2) -- +(#3 + 90:1*#5) node[above]
+        {$\mathbf{\hat{#1}}_\mathrm{\textbf{#7}}$};
 }
 
 \newcommand{\basisInPlaneThree}[8]{
@@ -261,9 +263,11 @@
     % 6: label for vector pointing "up".
     % 7: label for vector pointing "out".
     \draw[->, #4, very thick]
-        (#2) -- +(#3:1*#5) node[above] {$\mathbf{\hat{#1}}_\mathrm{\textbf{#6}}$};
+        (#2) -- +(#3:1*#5) node[above]
+        {$\mathbf{\hat{#1}}_\mathrm{\textbf{#6}}$};
     \draw[->, #4, very thick]
-        (#2) -- +(#3 + 90:1*#5) node[above] {$\mathbf{\hat{#1}}_\mathrm{\textbf{#7}}$};
+        (#2) -- +(#3 + 90:1*#5) node[above]
+        {$\mathbf{\hat{#1}}_\mathrm{\textbf{#7}}$};
     \draw[->, #4, very thick] (#2)++(-60:0.2) arc (-60:150:0.2)
         node[below] {$\mathbf{\hat{#1}}_\mathrm{\textbf{#8}}$};
 }
