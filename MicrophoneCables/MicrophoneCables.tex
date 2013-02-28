@@ -24,7 +24,11 @@
     \begin{scope}[shift=(#1), line join=round]
 
         % Front face.
-        \draw[#5!40!black,fill=#5] (0, 0) rectangle +(#2, #3);
+        \begin{scope}[canvas is yx plane at z=0]
+            % NOTE: must use yx instead of xy canvas to draw in perspective
+            % correctly.
+            \draw[#5!40!black,fill=#5] (0, 0) rectangle (#3, #2);
+        \end{scope}
 
         % Top face.
         \begin{scope}[canvas is xz plane at y=#3]
@@ -51,8 +55,10 @@
     \begin{scope}[shift=(#1), line join=round]
 
         % Front face.
-        \begin{scope}[canvas is xy plane at z=#2]
-            \draw[#5!40!black,fill=#5] (0,0) rectangle +(-#4, #3);
+        \begin{scope}[canvas is yx plane at z=#2]
+            % NOTE: must use yx instead of xy canvas to draw in perspective
+            % correctly.
+            \draw[#5!40!black,fill=#5] (0,0) rectangle (#3, -#4);
         \end{scope}
 
         % Top face.
@@ -69,12 +75,11 @@
 }
 
 \begin{document}
-\thispagestyle{empty}
 
-\begin{center}
-\begin{tikzpicture}[scale=0.3]
+\begin{tikzpicture}[scale=0.3,
+    ]
 
-    \def\wallthick{1}
+\def\wallthick{1}
 \coordinate (origin) at (0, 0, 0);
 \coordinate (A) at (0, 8, 20);
 \coordinate (B) at (0, 8, 0);
@@ -92,8 +97,5 @@
 \draw[green,->] (origin) -- (0, 1, 0);
 \draw[blue,->] (origin) -- (0, 0, 1);
 
-
-
 \end{tikzpicture}
-\end{center}
 \end{document}
