@@ -2,16 +2,14 @@
 import three;
 
 
-// Create a box with dimensions dim, with its local frame centered.
-surface createCenteredBox(triple dim) {
-  return scale(dim.x, dim.y, dim.z)*shift(-0.5,-0.5,-0.5)*unitcube;
-}
+// ****************************************************************************
+// Pens and Materials
+// ****************************************************************************
 
-// Draw a box with opposite corners at p1 and p2, expressed in frame t, with material m.
-void drawBox(triple p1, triple p2, transform3 t, material m) {
-  triple d = p2 - p1;
-  draw(t*shift(-p1.x, -p1.y, -p1.z)*scale(d.x, d.y, d.z)*unitcube,m);
-}
+// style of some lines... 
+// perhaps these should go into the library, once we find good settings
+pen medium=linewidth(1);
+pen thick=linewidth(1.5);
 
 // Define some default materials by combining standard pen colors
 // These definitely need refinement
@@ -32,3 +30,27 @@ material mLightBlue = material(diffusepen=lightblue,   emissivepen=lightblue, op
 material mMedBlue   = material(diffusepen=mediumblue,  emissivepen=mediumblue, opacity=0.5);
 material mBlue      = material(diffusepen=blue,        emissivepen=blue, opacity=0.5);
 
+
+// ****************************************************************************
+// Functions
+// ****************************************************************************
+
+// Draw a set of basis vectors
+void drawBasis(transform3 t, real scale, string text ) 
+{
+	triple zero = (0,0,0);
+	draw(t*(zero--scale*X),red+thick,Arrow3); 
+	draw(t*(zero--scale*Y),green+thick,Arrow3);
+	draw(t*(zero--scale*Z),blue+thick,Arrow3);
+}
+
+// Create a box with dimensions dim, with its local frame centered.
+surface createCenteredBox(triple dim) {
+  return scale(dim.x, dim.y, dim.z)*shift(-0.5,-0.5,-0.5)*unitcube;
+}
+
+// Draw a box with opposite corners at p1 and p2, expressed in frame t, with material m.
+void drawBox(triple p1, triple p2, transform3 t, material m) {
+  triple d = p2 - p1;
+  draw(t*shift(-p1.x, -p1.y, -p1.z)*scale(d.x, d.y, d.z)*unitcube,m);
+}

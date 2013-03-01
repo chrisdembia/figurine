@@ -1,0 +1,25 @@
+\documentclass{standalone}
+\usepackage{asymptote}
+
+\begin{document}
+\begin{asy}[width=10cm,height=10cm]
+
+import obj;
+
+size(15cm);
+//currentprojection=orthographic(0,2,5,up=Y);
+currentprojection=perspective( (0, 2, 5), up=Y );
+
+
+
+pen[] surfacepen={darkred,brown,darkred+orange,heavyred,heavyred,darkred+orange,
+                  palegreen+blue+lightgrey,darkred,darkred,yellow,darkred,white,
+                  white,white,white,white,white};
+surfacepen.cyclic=true;
+
+draw(obj("tree.obj",verbose=false,surfacepen));
+
+\end{asy}
+
+
+\end{document}

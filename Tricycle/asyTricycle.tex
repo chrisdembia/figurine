@@ -1,0 +1,131 @@
+\documentclass{standalone}
+\usepackage{asymptote}
+
+\begin{document}
+\begin{asy}[width=10cm,height=10cm]
+
+// See http://asymptote.sourceforge.net/doc/Import.html
+import three;
+import settings;
+
+// Include has the effect of doing a drop-in replacement of the file
+// For some reason I can't get import to work unless it is in the same directory.
+include "../MechanicsLibrary.asy"; 
+include "../SceneGraph.asy"; 
+
+
+currentprojection=perspective( (15, 10,5 ), up=Z );
+// showtarget=true, autoadjust=true, center=true );
+
+// Construct the scene...
+Node scene = Node( "root", null );
+
+// N frame
+Node frameN = Node( "N", scene );
+scene.addChild(frameN);
+frameN.addChild(createBasis("basisN", 1));
+
+Node frameA = Node( "A", frameN );
+frameN.addChild(frameA);
+frameA.addChild(createBasis("basisA", 1));
+frameA.rotation = rotate(-30, Z);
+frameA.translation = shift(1,2,0);
+
+// Draw the scene
+scene.render(scale3(1));
+
+
+
+// Draw the N basis.
+//drawBasis(scale3(1), 1, "N");
+
+/*
+// ***************************************************************************
+// I think we might be able to do MG-style frame definitions...
+// Random experiment, just to see if it works:
+real theta = -30; // argh, rotate takes a number of degrees, not radians
+triple ax = rotate(theta, Y)*X;
+triple ay = rotate(theta, Y)*Y;
+triple az = rotate(theta, Y)*Z;
+real len = 3;
+triple N2 = (10, 0, 0);
+draw(shift(N2)*(zero--(len*ax)),red+medium,Arrow3); 
+draw(shift(N2)*(zero--(len*ay)),green+medium,Arrow3);
+draw(shift(N2)*(zero--(len*az)),blue+medium,Arrow3);
+draw(shift(N2)*(zero--len*(2*ax+az)), red, Arrow3);
+// Cool it works! 
+// TODO package this into useful library stuff and remove form this example.
+// ***************************************************************************
+*/
+
+/*
+// Define our position vectors... in the N frame.
+triple zero = (0,0,0);
+triple No = (0, 0, 0);
+triple A = (0, 8, 20);
+triple B = (0, 8, 0);
+triple C = (15, 8, 0);
+triple Qz = (0,0,8);
+triple Qxz = (7,0,8);
+triple Q = (7, 5, 8);
+
+// ***************************************************************************
+// I think we might be able to do MG-style frame definitions...
+// Random experiment, just to see if it works:
+real theta = -30; // argh, rotate takes a number of degrees, not radians
+triple ax = rotate(theta, Y)*X;
+triple ay = rotate(theta, Y)*Y;
+triple az = rotate(theta, Y)*Z;
+real len = 3;
+triple N2 = (10, 0, 0);
+draw(shift(N2)*(zero--(len*ax)),red+medium,Arrow3); 
+draw(shift(N2)*(zero--(len*ay)),green+medium,Arrow3);
+draw(shift(N2)*(zero--(len*az)),blue+medium,Arrow3);
+draw(shift(N2)*(zero--len*(2*ax+az)), red, Arrow3);
+// Cool it works! 
+// TODO package this into useful library stuff and remove form this example.
+// ***************************************************************************
+
+// We can predefine surfaces as geometry plus affine transforms.
+surface point = scale3(0.25)*unitsphere; // unitsphere has radius 1?
+surface microphone = createCenteredBox((0.4, 0.8, 0.4));
+
+// Draw the Walls
+drawBox(No, A, identity4, mLightGreen);
+drawBox(No, C, identity4, mLightBlue);
+
+// Draw the points
+draw(shift(No)*point,mBlack);
+draw(shift(A)*point,mBlack);
+draw(shift(B)*point,mBlack);
+draw(shift(C)*point,mBlack);
+draw(shift(Q)*point,mRed);
+draw(shift(Qz)*point,mBlack);
+draw(shift(Qxz)*point,mBlack);
+
+// Draw the microphone
+draw(shift(Q-Y*2/3)*microphone,mRed);
+
+// Draw cables
+draw((A--Q), black);
+draw((B--Q), black);
+draw((C--Q), black);
+
+// Draw dimensions
+draw(shift(Y/2)*(A--B), black, Arrows3, Bars3(Y), PenMargins2); // Arrows3 is bi-directional
+//draw("$12$", shift(up)*(A--B), Z, Arrows3, Bars3(Y), PenMargins2); // I can't figue out labels...
+draw(shift(Y/2)*(B--C), black, Arrows3, Bars3(Y));
+draw(shift(X/2)*(C--(15,0,0)), black, Arrows3, Bars3(X));
+
+draw(shift(Y/2)*(No -- (0,0,8)), black, Arrows3, Bars3(Y));
+draw(shift(-Y/2)*((0,0,8) -- (7,0,8)), black, Arrows3, Bars3(Y));
+draw(shift(X/2)*((7,0,8) -- (7,5,8)), black, Arrows3, Bars3(X));
+*/
+
+
+
+
+\end{asy}
+
+
+\end{document}
