@@ -1,5 +1,6 @@
 // Note sure if we need/ should include the dependencies of this file here.
 import three;
+import graph3;
 
 
 // ****************************************************************************
