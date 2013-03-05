@@ -85,7 +85,7 @@ struct MBDArrow {
 	void render(transform3 t)
 	{
 		write("Drawing an MBDArrow.");
-        draw(t*parent.mPath, parent.mPen, mArrow);
+        draw(t*parent.mPath, parent.mPen, mArrow, nolight);
 		//draw(t*parent.mPath, parent.mPen, Arrows3(DefaultHead3));
         label(this.mLabel, t*parent.mPath);
 	}
@@ -103,19 +103,26 @@ struct SurfRenderable {
 
 	surface mSurf;
     material mMat;
+    bool useNoLight;
 
-	void operator init(surface s, material m)
+	void operator init(surface s, material m, bool unl=true)
 	{
         parent.operator init();
 		this.mSurf = s;
         this.mMat = m;
+        this.useNoLight = unl;
 	}
 
 	void render(transform3 t)
 	{
 		write("Drawing a surfrenderable.");
         // nolight prevents things from being dark.
-		draw(t*this.mSurf, this.mMat, nolight);
+        if (this.useNoLight) {
+            draw(t*this.mSurf, this.mMat, nolight);
+        } else {
+            draw(t*this.mSurf, this.mMat);
+        }
+
 	}
     parent.render=render;
 }
@@ -233,18 +240,25 @@ Node createPathBasis(string name)
 }
 
 // Create a node that draws a set of basis vectors using paths.
-Node createUniformPathBasis(string name, transform3 thisShift, pen p)
+Node createUniformPathBasis(string name, transform3 thisShift, pen p,
+        string letter="")
 {
 	write("Creating basis "+name+".");
 	Node n = Node(name, null);
-	n.addDrawable( MBDArrow((0,0,0), (1,0,0), p));
-	n.addDrawable( MBDArrow((0,0,0), (0,1,0), p));
-	n.addDrawable( MBDArrow((0,0,0), (0,0,1), p));
-	//n.addDrawable( MBDArrow((0,0,0), (1,0,0), p, L="$x$"));
-	//n.addDrawable( MBDArrow((0,0,0), (0,1,0), p, L="$y$"));
-	//n.addDrawable( MBDArrow((0,0,0), (0,0,1), p, L="$z$"));
+    if (letter == "") {
+        n.addDrawable( MBDArrow((0,0,0), (1,0,0), p));
+        n.addDrawable( MBDArrow((0,0,0), (0,1,0), p));
+        n.addDrawable( MBDArrow((0,0,0), (0,0,1), p));
+    } else {
+	n.addDrawable( MBDArrow((0,0,0), (1,0,0), p,
+                L=Label("$\mathbf{"+letter+"}_x$", size=".1", EndPoint)));
+	n.addDrawable( MBDArrow((0,0,0), (0,1,0), p,
+                L=Label("$\mathbf{"+letter+"}_y$", size=".1", EndPoint)));
+	n.addDrawable( MBDArrow((0,0,0), (0,0,1), p,
+                L=Label("$\mathbf{"+letter+"}_z$", size=".1", EndPoint)));
+    }
     n.setTranslation(thisShift);
-    n.setScaling(scale3(0.7));
+    n.setScaling(scale3(0.6));
 	return n;
 }
 
